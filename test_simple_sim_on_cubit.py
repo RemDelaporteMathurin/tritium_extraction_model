@@ -1,7 +1,8 @@
 import festim as F
 from fenics import *
 
-def tag_mesh(filename='test.xdmf'):
+
+def tag_mesh(filename="test.xdmf"):
     mesh = Mesh()
     XDMFFile(filename).read(mesh)
 
@@ -10,7 +11,6 @@ def tag_mesh(filename='test.xdmf'):
     volume_markers.set_all(1)
 
     tol = 1e-14
-
 
     inlet_surface = CompiledSubDomain(
         "on_boundary && near(x[0], 32, tol)",
@@ -22,7 +22,7 @@ def tag_mesh(filename='test.xdmf'):
     )
 
     inlet_id = 1
-    outlet_id =2
+    outlet_id = 2
     walls_id = 3
     surface_markers = MeshFunction("size_t", mesh, mesh.topology().dim() - 1)
     surface_markers.set_all(walls_id)
@@ -41,15 +41,15 @@ def run_simple_sim():
     tag_mesh()
     my_sim = F.Simulation()
 
-    my_sim.mesh = F.MeshFromXDMF(volume_file='volume_markers.xdmf', boundary_file='surface_markers.xdmf')
+    my_sim.mesh = F.MeshFromXDMF(
+        volume_file="volume_markers.xdmf", boundary_file="surface_markers.xdmf"
+    )
 
     my_sim.materials = F.Material(id=1, D_0=1, E_D=0)
 
     inlet_BC = F.DirichletBC(surfaces=1, value=1, field="solute")
     outlet_BC = F.DirichletBC(surfaces=2, value=0, field="solute")
-    my_sim.boundary_conditions = [
-        inlet_BC, outlet_BC
-    ]
+    my_sim.boundary_conditions = [inlet_BC, outlet_BC]
 
     my_sim.T = F.Temperature(500)
 
@@ -60,5 +60,6 @@ def run_simple_sim():
     my_sim.initialise()
     my_sim.run()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     run_simple_sim()
